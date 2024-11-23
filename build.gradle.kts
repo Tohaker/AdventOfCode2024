@@ -1,5 +1,10 @@
 plugins {
     id("java")
+    id("application")
+}
+
+application {
+    mainClass = if (project.hasProperty("mainClass")) project.property("mainClass").toString() else "NULL"
 }
 
 group = "org.aoc"
