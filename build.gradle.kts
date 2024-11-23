@@ -3,14 +3,14 @@ plugins {
     id("application")
 }
 
-application {
-    mainClass = if (project.hasProperty("mainClass")) project.property("mainClass").toString() else "NULL"
-}
-
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(23))
     }
+}
+
+application {
+    mainClass = if (project.hasProperty("mainClass")) project.property("mainClass").toString() else "NULL"
 }
 
 group = "org.aoc"
