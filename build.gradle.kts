@@ -3,6 +3,12 @@ plugins {
     id("application")
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(23))
+    }
+}
+
 application {
     mainClass = if (project.hasProperty("mainClass")) project.property("mainClass").toString() else "NULL"
 }
