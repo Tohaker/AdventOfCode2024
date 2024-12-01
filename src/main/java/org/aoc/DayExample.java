@@ -8,8 +8,8 @@ public class DayExample {
     public static void main(String[] args) throws IOException {
         String input = FileUtils.openInput("DayExample.txt");
 
-        System.out.println("Day 1 - Part 1: " + part1(input));
-        System.out.println("Day 1 - Part 2: " + part2(input));
+        System.out.println("Day Example - Part 1: " + part1(input));
+        System.out.println("Day Example - Part 2: " + part2(input));
     }
 
     public static int part1(String input) {
