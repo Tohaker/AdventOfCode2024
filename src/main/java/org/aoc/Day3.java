@@ -8,6 +8,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Day3 {
+    // Finds a string matching "mul(1,2)" and places each number into its own group
+    static String multiplierPattern = "mul\\((\\d{1,3}),(\\d{1,3})\\)";
+
     public static void main(String[] args) throws IOException {
         String input = FileUtils.openInput("Day3.txt").replaceAll("[\r\n]+", "");
 
@@ -16,9 +19,7 @@ public class Day3 {
     }
 
     public static int part1(String input) {
-        String pattern = "mul\\((\\d{1,3}),(\\d{1,3})\\)";
-
-        Pattern r = Pattern.compile(pattern);
+        Pattern r = Pattern.compile(multiplierPattern);
 
         Matcher m  = r.matcher(input);
 
@@ -35,11 +36,10 @@ public class Day3 {
     }
 
     public static int part2(String input) {
-        String dontPattern = "(don't\\(\\))";
-        String doPattern = "(do\\(\\))";
-        String pattern = "mul\\((\\d{1,3}),(\\d{1,3})\\)";
+        String dontPattern = "(don't\\(\\))"; // Finds the string literal "don't()"
+        String doPattern = "(do\\(\\))"; // Finds the string literal "do()"
 
-        Pattern r = Pattern.compile(dontPattern + "|" + doPattern + "|" + pattern);
+        Pattern r = Pattern.compile(dontPattern + "|" + doPattern + "|" + multiplierPattern);
 
         Matcher m  = r.matcher(input);
 
