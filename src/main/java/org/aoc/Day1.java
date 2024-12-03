@@ -13,7 +13,7 @@ public class Day1 {
         System.out.println("Day 1 - Part 2: " + part2(input));
     }
 
-    static List<List<Integer>> parseInputBetter(String input) {
+    static List<List<Integer>> parseInput(String input) {
         List<Integer> leftList = new ArrayList<>();
         List<Integer> rightList = new ArrayList<>();
 
@@ -28,7 +28,7 @@ public class Day1 {
     }
 
     public static int part1(String input) {
-        List<List<Integer>> lists = parseInputBetter(input);
+        List<List<Integer>> lists = parseInput(input);
 
         List<Integer> leftList = lists.getFirst();
         List<Integer> rightList = lists.getLast();
@@ -49,7 +49,7 @@ public class Day1 {
     }
 
     public static int part2(String input) {
-        List<List<Integer>> lists = parseInputBetter(input);
+        List<List<Integer>> lists = parseInput(input);
 
         List<Integer> leftList = lists.getFirst();
         List<Integer> rightList = lists.getLast();
