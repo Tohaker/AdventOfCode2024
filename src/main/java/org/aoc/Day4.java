@@ -17,7 +17,7 @@ public class Day4 {
         String input = FileUtils.openInput("Day4.txt");
 
         System.out.println("Day 4 - Part 1: " + part1(input));
-//        System.out.println("Day 1 - Part 2: " + part2(input));
+        System.out.println("Day 4 - Part 2: " + part2(input));
     }
 
     static List<List<String>> parseInput(String input) {
@@ -32,9 +32,8 @@ public class Day4 {
 
     static List<List<String>> rotate90Degrees(List<List<String>> grid) {
         List<List<String>> rotatedGrid = new ArrayList<>();
-        int size = grid.size();
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < grid.size(); i++) {
             List<String> newLine = new ArrayList<>();
 
             for (List<String> strings : grid) {
@@ -48,13 +47,13 @@ public class Day4 {
     }
 
     static List<List<String>> flipVertically(List<List<String>> grid) {
-        List<List<String>> flippedgrid = new ArrayList<>();
+        List<List<String>> flippedGrid = new ArrayList<>();
 
         for (List<String> strings : grid) {
-            flippedgrid.add(strings.reversed());
+            flippedGrid.add(strings.reversed());
         }
 
-        return flippedgrid;
+        return flippedGrid;
     }
 
     static List<List<String>> rotate45Degrees(List<List<String>> grid) {
@@ -76,7 +75,8 @@ public class Day4 {
         Pattern pattern = Pattern.compile("(?=(XMAS))|(?=(SAMX))");
 
         grid.forEach(line -> {
-            String joined = String.join("",line.stream().filter(Objects::nonNull).toList());
+            List<String> filteredLine = line.stream().filter(Objects::nonNull).toList();
+            String joined = String.join("",filteredLine);
             Matcher m = pattern.matcher(joined);
 
             count.addAndGet((int) m.results().count());
@@ -86,17 +86,41 @@ public class Day4 {
     }
 
     static int part1(String input) {
-        int count = 0;
-
         List<List<String>> grid = parseInput(input);
         List<List<String>> rotatedGrid = rotate90Degrees(grid);
         List<List<String>> rotated45Grid = rotate45Degrees(grid);
         List<List<String>> rotated135Grid = rotate45Degrees(flipVertically(rotatedGrid));
 
-        count += findXMAS(grid);
-        count += findXMAS(rotatedGrid);
-        count += findXMAS(rotated45Grid);
-        count += findXMAS(rotated135Grid);
+        return findXMAS(grid) + findXMAS(rotatedGrid) + findXMAS(rotated45Grid) + findXMAS(rotated135Grid);
+    }
+
+    static int part2(String input) {
+        int count = 0;
+
+        List<List<String>> grid = parseInput(input);
+
+        int size = grid.size();
+
+        List<String> possibilities = Arrays.asList("MSAMS", "SSAMM", "SMASM", "MMASS");
+
+        for (int i = 0; i < size - 2; i++) {
+            for (int j = 0; j < size - 2; j++) {
+                // M . S
+                // . A .
+                // M . S
+
+              String cross =
+                      grid.get(i).get(j) +
+                      grid.get(i).get(j + 2) +
+                      grid.get(i + 1).get(j + 1) +
+                      grid.get(i + 2).get(j) +
+                      grid.get(i + 2).get(j + 2);
+
+              if (possibilities.contains(cross)) {
+                  count++;
+              }
+            }
+        }
 
         return count;
     }

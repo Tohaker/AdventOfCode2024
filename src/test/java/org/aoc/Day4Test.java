@@ -40,4 +40,16 @@ public class Day4Test {
     void testPart1() {
         assertEquals(2390, Day4.part1(realInput));
     }
+
+    @Test
+    @DisplayName("Should find all the X-MAS's in the grid")
+    void testPart2Example() {
+        assertEquals(9, Day4.part2(exampleInput));
+    }
+
+    @Test
+    @DisplayName("Part 2 should return 1809")
+    void testPart2() {
+        assertEquals(1809, Day4.part2(realInput));
+    }
 }
