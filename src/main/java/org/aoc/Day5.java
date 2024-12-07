@@ -64,10 +64,13 @@ public class Day5 {
         System.out.println("Day 5 - Part 2: " + part2(input));
     }
 
-    public static int part1(String input) {
+    static String[] splitInput(String input) {
+        return input.split("\\r\\n\\r\\n|\\n\\n");
+    }
+
+    static Map<Integer, Page> parsePages(String input) {
         Pattern ruleRegex = Pattern.compile("(\\d+)\\|(\\d+)");
         Map<Integer, Page> pages = new HashMap<>();
-        List<List<Integer>> productionRuns = new ArrayList<>();
 
         input.lines().forEach(line -> {
             Matcher m = ruleRegex.matcher(line);
@@ -94,10 +97,28 @@ public class Day5 {
                     pages.put(higherPageNumber, higherPage);
                 }
             }
-            else if (!line.isEmpty()) {
-                productionRuns.add(Arrays.stream(line.split(",")).map(Integer::parseInt).toList());
-            }
         });
+
+        return pages;
+    }
+
+    static List<List<Integer>> parseProductionRuns(String input) {
+        return input
+                .lines()
+                .map(line ->
+                        Arrays.stream(line.split(","))
+                                .map(Integer::parseInt)
+                                .toList()
+                ).toList();
+    }
+
+    public static int part1(String input) {
+        String[] sections = splitInput(input);
+        String rules = sections[0];
+        String runs = sections[1];
+
+        Map<Integer, Page> pages = parsePages(rules);
+        List<List<Integer>> productionRuns = parseProductionRuns(runs);
 
         int total = 0;
 
@@ -115,39 +136,12 @@ public class Day5 {
     }
 
     public static int part2(String input) {
-        Pattern ruleRegex = Pattern.compile("(\\d+)\\|(\\d+)");
-        Map<Integer, Page> pages = new HashMap<>();
-        List<List<Integer>> productionRuns = new ArrayList<>();
+        String[] sections = splitInput(input);
+        String rules = sections[0];
+        String runs = sections[1];
 
-        input.lines().forEach(line -> {
-            Matcher m = ruleRegex.matcher(line);
-
-            if (m.matches()) {
-                int lowerPageNumber = Integer.parseInt(m.group(1));
-                int higherPageNumber = Integer.parseInt(m.group(2));
-
-                if (pages.containsKey(lowerPageNumber)) {
-                    pages.get(lowerPageNumber).addLargerNumber(higherPageNumber);
-                } else {
-                    Page lowerPage = new Page(lowerPageNumber);
-                    lowerPage.addLargerNumber(higherPageNumber);
-
-                    pages.put(lowerPageNumber, lowerPage);
-                }
-
-                if (pages.containsKey(higherPageNumber)) {
-                    pages.get(higherPageNumber).addSmallerNumber(lowerPageNumber);
-                } else {
-                    Page higherPage = new Page(higherPageNumber);
-                    higherPage.addSmallerNumber(lowerPageNumber);
-
-                    pages.put(higherPageNumber, higherPage);
-                }
-            }
-            else if (!line.isEmpty()) {
-                productionRuns.add(Arrays.stream(line.split(",")).map(Integer::parseInt).toList());
-            }
-        });
+        Map<Integer, Page> pages = parsePages(rules);
+        List<List<Integer>> productionRuns = parseProductionRuns(runs);
 
         int total = 0;
 

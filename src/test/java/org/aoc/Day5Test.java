@@ -1,7 +1,11 @@
 package org.aoc;
 
+import org.aoc.utils.FileUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -36,6 +40,12 @@ public class Day5Test {
             61,13,29
             97,13,75,29,47
             """;
+    static String realInput;
+
+    @BeforeAll
+    static void readInput() throws IOException {
+        realInput = FileUtils.openInput("Day5.txt");
+    }
 
     @Test
     @DisplayName("Should add the middle values of valid printing orders")
@@ -44,8 +54,20 @@ public class Day5Test {
     }
 
     @Test
+    @DisplayName("Part 1 should return 5275")
+    void testPart1() {
+        assertEquals(5275, Day5.part1(realInput));
+    }
+
+    @Test
     @DisplayName("Should add the middle values of invalid printing orders")
     void testPart2Example() {
         assertEquals(123, Day5.part2(exampleInput));
+    }
+
+    @Test
+    @DisplayName("Part 2 should return 6191")
+    void testPart2() {
+        assertEquals(6191, Day5.part2(realInput));
     }
 }
