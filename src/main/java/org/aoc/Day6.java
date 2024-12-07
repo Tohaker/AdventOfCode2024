@@ -7,6 +7,13 @@ import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
+enum Direction {
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST
+}
+
 public class Day6 {
     public static void main(String[] args) throws IOException {
         String input = FileUtils.openInput("Day6.txt");
@@ -15,32 +22,64 @@ public class Day6 {
         System.out.println("Day 6 - Part 2: " + part2(input));
     }
 
+    static Point determineNextPosition(Point position, Direction direction) {
+        switch (direction) {
+            case Direction.NORTH: {
+                position = new Point(position.x, position.y - 1);
+                break;
+            }
+            case Direction.EAST: {
+                position = new Point(position.x + 1, position.y);
+                break;
+            }
+            case Direction.SOUTH: {
+                position = new Point(position.x, position.y + 1);
+                break;
+            }
+            case Direction.WEST: {
+                position = new Point(position.x - 1, position.y);
+                break;
+            }
+        }
+
+        return position;
+    }
+
+    static Direction determineNextDirection(Direction direction) {
+        switch (direction) {
+            case Direction.NORTH: {
+                direction = Direction.EAST;
+                break;
+            }
+            case Direction.EAST: {
+                direction = Direction.SOUTH;
+                break;
+            }
+            case Direction.SOUTH: {
+                direction = Direction.WEST;
+                break;
+            }
+            case Direction.WEST: {
+                direction = Direction.NORTH;
+                break;
+            }
+        }
+
+        return direction;
+    }
+
     static Set<Point> findPositionsWalked(List<Point> obstacles, Point start, int width, int height) {
         Set<Point> positions = new HashSet<>();
         Point nextPosition = new Point(start);
         Point currentPosition = null;
-        String direction = "N";
+        Direction direction = Direction.NORTH;
 
-        while (nextPosition.getY() < height && nextPosition.getX() < width) {
+        while (nextPosition.getY() >= 0 &&
+                nextPosition.getY() < height &&
+                nextPosition.getX() >= 0 &&
+                nextPosition.getX() < width) {
             if (obstacles.contains(nextPosition)) {
-                switch (direction) {
-                    case "N": {
-                        direction = "E";
-                        break;
-                    }
-                    case "E": {
-                        direction = "S";
-                        break;
-                    }
-                    case "S": {
-                        direction = "W";
-                        break;
-                    }
-                    case "W": {
-                        direction = "N";
-                        break;
-                    }
-                }
+                direction = determineNextDirection(direction);
 
                 // Reset nextPosition to currentPosition, as we can't go past an obstacle.
                 nextPosition = currentPosition;
@@ -49,24 +88,7 @@ public class Day6 {
                 positions.add(currentPosition);
             }
 
-            switch (direction) {
-                case "N": {
-                    nextPosition = new Point(nextPosition.x, nextPosition.y - 1);
-                    break;
-                }
-                case "E": {
-                    nextPosition = new Point(nextPosition.x + 1, nextPosition.y);
-                    break;
-                }
-                case "S": {
-                    nextPosition = new Point(nextPosition.x, nextPosition.y + 1);
-                    break;
-                }
-                case "W": {
-                    nextPosition = new Point(nextPosition.x - 1, nextPosition.y);
-                    break;
-                }
-            }
+            nextPosition = determineNextPosition(nextPosition, direction);
         }
 
         return positions;
@@ -106,11 +128,10 @@ public class Day6 {
         // Parse input
 
         List<Point> obstacles = new ArrayList<>();
-        Set<Point> positions = new HashSet<>();
         Point start = null;
         Point currentPosition = null;
         Point nextPosition = null;
-        String direction = "N";
+        Direction direction = Direction.NORTH;
 
         int height = 0;
         int width = 0;
@@ -138,12 +159,9 @@ public class Day6 {
         initialRoute.remove(start); // Remove start as an obstacle can't be placed there
 
         // Loop through all possible placement of obstacles
-
         for (Point obstacle : initialRoute) {
-            // Start walking
-
             // Store point with direction for each step
-            Set<Map.Entry<Point, String>> coveredGround = new HashSet<>();
+            Set<Map.Entry<Point, Direction>> coveredGround = new HashSet<>();
 
             while (nextPosition.getY() >= 0 && nextPosition.getY() < height && nextPosition.getX() >= 0 && nextPosition.getX() < width) {
                 if (coveredGround.contains(new AbstractMap.SimpleEntry<>(nextPosition, direction))) {
@@ -152,58 +170,21 @@ public class Day6 {
                 }
 
                 if (obstacles.contains(nextPosition) || nextPosition.equals(obstacle)) {
-                    switch (direction) {
-                        case "N": {
-                            direction = "E";
-                            break;
-                        }
-                        case "E": {
-                            direction = "S";
-                            break;
-                        }
-                        case "S": {
-                            direction = "W";
-                            break;
-                        }
-                        case "W": {
-                            direction = "N";
-                            break;
-                        }
-                    }
+                    direction = determineNextDirection(direction);
 
                     // Reset nextPosition to currentPosition, as we can't go past an obstacle.
                     nextPosition = currentPosition;
                 } else {
                     currentPosition = nextPosition;
-                    positions.add(currentPosition);
                     coveredGround.add(new AbstractMap.SimpleEntry<>(currentPosition, direction));
                 }
 
-                switch (direction) {
-                    case "N": {
-                        nextPosition = new Point(nextPosition.x, nextPosition.y - 1);
-                        break;
-                    }
-                    case "E": {
-                        nextPosition = new Point(nextPosition.x + 1, nextPosition.y);
-                        break;
-                    }
-                    case "S": {
-                        nextPosition = new Point(nextPosition.x, nextPosition.y + 1);
-                        break;
-                    }
-                    case "W": {
-                        nextPosition = new Point(nextPosition.x - 1, nextPosition.y);
-                        break;
-                    }
-                }
+                nextPosition = determineNextPosition(nextPosition, direction);
             }
 
             // Reset for next permutation
-
-            positions = new HashSet<>();
             nextPosition = new Point(start);
-            direction = "N";
+            direction = Direction.NORTH;
         }
 
         return loopsFound;
