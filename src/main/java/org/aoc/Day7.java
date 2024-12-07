@@ -14,16 +14,16 @@ public class Day7 {
         DecimalFormat df = new DecimalFormat("#");
         df.setMaximumFractionDigits(20);
 
-        System.out.println("Day 7 - Part 1: " + df.format(part1(input)));
-//        System.out.println("Day 7 - Part 2: " + part2(input));
+        System.out.println("Day 7 - Part 1: " + part1(input));
+        System.out.println("Day 7 - Part 2: " + part2(input));
     }
 
-    static List<Map.Entry<Double, List<Integer>>> parseInput(String input) {
-        List<Map.Entry<Double, List<Integer>>> equations = new ArrayList<>();
+    static List<Map.Entry<Long, List<Integer>>> parseInput(String input) {
+        List<Map.Entry<Long, List<Integer>>> equations = new ArrayList<>();
 
         input.lines().forEach(line -> {
             String[] splitted = line.split(": ");
-            double key = Double.parseDouble(splitted[0]);
+            long key = Long.parseLong(splitted[0]);
             List<Integer> value = Arrays.stream(splitted[1].split(" ")).map(Integer::parseInt).toList();
 
             equations.add(new AbstractMap.SimpleEntry<>(key, value));
@@ -32,14 +32,14 @@ public class Day7 {
         return equations;
     }
 
-    public static double part1(String input) {
-        List<Map.Entry<Double, List<Integer>>> equations = parseInput(input);
+    public static long part1(String input) {
+        List<Map.Entry<Long, List<Integer>>> equations = parseInput(input);
 
-        double total = 0;
+        long total = 0;
 
         String[] operators = new String[]{"+", "*"};
 
-        for (Map.Entry<Double, List<Integer>> equation : equations) {
+        for (Map.Entry<Long, List<Integer>> equation : equations) {
             int size = equation.getValue().size() - 1;
 
             List<List<String>> output = Generator.combination(operators)
@@ -49,13 +49,52 @@ public class Day7 {
 
 
             if (output.stream().anyMatch(list -> {
-                double subtotal = equation.getValue().getFirst();
+                long subtotal = equation.getValue().getFirst();
 
                 for (int i = 0; i < size; i++) {
                     if (list.get(i).equals("+")) {
                         subtotal += equation.getValue().get(i + 1);
                     } else {
                         subtotal *= equation.getValue().get(i + 1);
+                    }
+                }
+
+                return subtotal == equation.getKey();
+            })) {
+                total += equation.getKey();
+            }
+        }
+
+        return total;
+    }
+
+    public static long part2(String input) {
+        List<Map.Entry<Long, List<Integer>>> equations = parseInput(input);
+
+        long total = 0;
+
+        String[] operators = new String[]{"+", "*", "||"};
+
+        for (Map.Entry<Long, List<Integer>> equation : equations) {
+            int size = equation.getValue().size() - 1;
+
+            List<List<String>> output = Generator.combination(operators)
+                    .multi(size).stream().flatMap(combination ->
+                            Generator.permutation(combination).simple().stream()
+                    ).toList();
+
+            if (output.stream().anyMatch(list -> {
+                List<Integer> values = new ArrayList<>(equation.getValue());
+
+                long subtotal = values.getFirst();
+
+                for (int i = 0; i < list.size(); i++) {
+                    if (list.get(i).equals("+")) {
+                        subtotal += values.get(i + 1);
+                    } else if (list.get(i).equals("*")) {
+                        subtotal *= values.get(i + 1);
+                    } else {
+                        subtotal = Long.parseLong(String.valueOf(subtotal) + String.valueOf(values.get(i + 1)));
                     }
                 }
 

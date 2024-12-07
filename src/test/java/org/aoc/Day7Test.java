@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -30,7 +29,7 @@ public class Day7Test {
     }
 
     @Test
-    @DisplayName("Should sum all possibly true equations")
+    @DisplayName("Should sum all possibly true equations with + and *")
     void testPart1Example() {
         assertEquals(3749, Day7.part1(exampleInput));
     }
@@ -38,6 +37,18 @@ public class Day7Test {
     @Test
     @DisplayName("Part 1 should return 5030892084481")
     void testPart1() {
-        assertEquals(Double.valueOf("5030892084481"), Day7.part1(realInput));
+        assertEquals(Long.valueOf("5030892084481"), Day7.part1(realInput));
+    }
+
+    @Test
+    @DisplayName("Should sum all possibly true equations with +, *, and ||")
+    void testPart2Example() {
+        assertEquals(11387, Day7.part2(exampleInput));
+    }
+
+    @Test
+    @DisplayName("Part 2 should return 91377448644679")
+    void testPart2() {
+        assertEquals(Long.valueOf("91377448644679"), Day7.part2(realInput));
     }
 }
