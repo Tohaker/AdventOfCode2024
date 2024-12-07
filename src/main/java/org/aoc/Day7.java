@@ -11,9 +11,6 @@ public class Day7 {
     public static void main(String[] args) throws IOException {
         String input = FileUtils.openInput("Day7.txt");
 
-        DecimalFormat df = new DecimalFormat("#");
-        df.setMaximumFractionDigits(20);
-
         System.out.println("Day 7 - Part 1: " + part1(input));
         System.out.println("Day 7 - Part 2: " + part2(input));
     }
@@ -32,48 +29,10 @@ public class Day7 {
         return equations;
     }
 
-    public static long part1(String input) {
+    static long sumValidEquations(String input, String[] operators) {
         List<Map.Entry<Long, List<Integer>>> equations = parseInput(input);
 
         long total = 0;
-
-        String[] operators = new String[]{"+", "*"};
-
-        for (Map.Entry<Long, List<Integer>> equation : equations) {
-            int size = equation.getValue().size() - 1;
-
-            List<List<String>> output = Generator.combination(operators)
-                    .multi(size).stream().flatMap(combination ->
-                            Generator.permutation(combination).simple().stream()
-                    ).toList();
-
-
-            if (output.stream().anyMatch(list -> {
-                long subtotal = equation.getValue().getFirst();
-
-                for (int i = 0; i < size; i++) {
-                    if (list.get(i).equals("+")) {
-                        subtotal += equation.getValue().get(i + 1);
-                    } else {
-                        subtotal *= equation.getValue().get(i + 1);
-                    }
-                }
-
-                return subtotal == equation.getKey();
-            })) {
-                total += equation.getKey();
-            }
-        }
-
-        return total;
-    }
-
-    public static long part2(String input) {
-        List<Map.Entry<Long, List<Integer>>> equations = parseInput(input);
-
-        long total = 0;
-
-        String[] operators = new String[]{"+", "*", "||"};
 
         for (Map.Entry<Long, List<Integer>> equation : equations) {
             int size = equation.getValue().size() - 1;
@@ -105,5 +64,17 @@ public class Day7 {
         }
 
         return total;
+    }
+
+    public static long part1(String input) {
+        String[] operators = new String[]{"+", "*"};
+
+        return sumValidEquations(input, operators);
+    }
+
+    public static long part2(String input) {
+        String[] operators = new String[]{"+", "*", "||"};
+
+        return sumValidEquations(input, operators);
     }
 }
