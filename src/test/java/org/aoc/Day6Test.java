@@ -46,4 +46,10 @@ public class Day6Test {
     void testPart2Example() {
         assertEquals(6, Day6.part2(exampleInput));
     }
+
+    @Test
+    @DisplayName("Should count the number of unique obstacles that cause loops")
+    void testPart2() {
+        assertEquals(1740, Day6.part2(realInput));
+    }
 }
