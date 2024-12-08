@@ -7,18 +7,14 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Day8 {
-    public static void main(String[] args) throws IOException {
-        String input = FileUtils.openInput("Day8.txt");
+class AntennaeMap {
+    Map<String, List<Point>> antennae;
+    int mapWidth;
+    int mapHeight;
 
-        System.out.println("Day 8 - Part 1: " + part1(input));
-        System.out.println("Day 8 - Part 2: " + part2(input));
-    }
+    AntennaeMap(String input) {
+        this.antennae =  new HashMap<>();
 
-    public static int part1(String input) {
-        // Parse map
-
-        Map<String, List<Point>> antennae =  new HashMap<>();
         AtomicInteger x = new AtomicInteger();
         AtomicInteger y = new AtomicInteger();
 
@@ -43,10 +39,26 @@ public class Day8 {
             y.getAndIncrement();
         });
 
+        this.mapHeight = y.get();
+        this.mapWidth = x.get();
+    }
+}
+
+public class Day8 {
+    public static void main(String[] args) throws IOException {
+        String input = FileUtils.openInput("Day8.txt");
+
+        System.out.println("Day 8 - Part 1: " + part1(input));
+        System.out.println("Day 8 - Part 2: " + part2(input));
+    }
+
+    public static int part1(String input) {
+        AntennaeMap antennaeMap = new AntennaeMap(input);
+
         // Find antinodes for each frequency
         Set<Point> antinodes = new HashSet<>();
 
-        antennae.forEach((frequency, locations) -> {
+        antennaeMap.antennae.forEach((_, locations) -> {
             for (int i = 0; i < locations.size(); i++) {
                 Point currentLocation = locations.get(i);
 
@@ -58,7 +70,12 @@ public class Day8 {
 
                     Point antinode = getAntinode(currentLocation, nextLocation);
 
-                    if (antinode.x < 0 || antinode.x >= x.get() || antinode.y < 0 || antinode.y >= y.get()) continue;
+                    if (
+                            antinode.x < 0 ||
+                            antinode.x >= antennaeMap.mapWidth ||
+                            antinode.y < 0 ||
+                            antinode.y >= antennaeMap.mapHeight
+                    ) continue;
 
                     antinodes.add(antinode);
                 }
@@ -69,37 +86,12 @@ public class Day8 {
     }
 
     public static int part2(String input) {
-        // Parse map
-
-        Map<String, List<Point>> antennae =  new HashMap<>();
-        AtomicInteger x = new AtomicInteger();
-        AtomicInteger y = new AtomicInteger();
-
-        input.lines().forEach(line -> {
-            x.set(0);
-
-            Arrays.stream(line.split("")).toList().forEach(val -> {
-                if (!val.equals(".")) {
-
-                    Point coord = new Point(x.get(), y.get());
-
-                    if (antennae.containsKey(val)) {
-                        antennae.get(val).add(coord);
-                    } else {
-                        antennae.put(val, new ArrayList<>(List.of(coord)));
-                    }
-                }
-
-                x.getAndIncrement();
-            });
-
-            y.getAndIncrement();
-        });
+        AntennaeMap antennaeMap = new AntennaeMap(input);
 
         // Find antinodes for each frequency
         Set<Point> antinodes = new HashSet<>();
 
-        antennae.forEach((frequency, locations) -> {
+        antennaeMap.antennae.forEach((_, locations) -> {
             for (int i = 0; i < locations.size(); i++) {
                 for (int j = 0; j < locations.size(); j++) {
                     if (i == j) continue; // Don't compare it to itself
@@ -110,7 +102,12 @@ public class Day8 {
 
                     Point antinode = getAntinode(currentLocation, nextLocation);
 
-                    while(antinode.x >= 0 && antinode.x < x.get() && antinode.y >= 0 && antinode.y < y.get()) {
+                    while(
+                            antinode.x >= 0 &&
+                            antinode.x < antennaeMap.mapWidth &&
+                            antinode.y >= 0 &&
+                            antinode.y < antennaeMap.mapHeight
+                    ) {
                         antinodes.add(antinode);
 
                         currentLocation = new Point(nextLocation);
