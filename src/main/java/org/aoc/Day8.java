@@ -12,7 +12,7 @@ public class Day8 {
         String input = FileUtils.openInput("Day8.txt");
 
         System.out.println("Day 8 - Part 1: " + part1(input));
-//        System.out.println("Day 8 - Part 2: " + part2(input));
+        System.out.println("Day 8 - Part 2: " + part2(input));
     }
 
     public static int part1(String input) {
@@ -62,6 +62,64 @@ public class Day8 {
 
                     antinodes.add(antinode);
                 }
+            }
+        });
+
+        return antinodes.size();
+    }
+
+    public static int part2(String input) {
+        // Parse map
+
+        Map<String, List<Point>> antennae =  new HashMap<>();
+        AtomicInteger x = new AtomicInteger();
+        AtomicInteger y = new AtomicInteger();
+
+        input.lines().forEach(line -> {
+            x.set(0);
+
+            Arrays.stream(line.split("")).toList().forEach(val -> {
+                if (!val.equals(".")) {
+
+                    Point coord = new Point(x.get(), y.get());
+
+                    if (antennae.containsKey(val)) {
+                        antennae.get(val).add(coord);
+                    } else {
+                        antennae.put(val, new ArrayList<>(List.of(coord)));
+                    }
+                }
+
+                x.getAndIncrement();
+            });
+
+            y.getAndIncrement();
+        });
+
+        // Find antinodes for each frequency
+        Set<Point> antinodes = new HashSet<>();
+
+        antennae.forEach((frequency, locations) -> {
+            for (int i = 0; i < locations.size(); i++) {
+                for (int j = 0; j < locations.size(); j++) {
+                    if (i == j) continue; // Don't compare it to itself
+
+                    // Find distance to next location
+                    Point currentLocation = locations.get(i);
+                    Point nextLocation = locations.get(j);
+
+                    Point antinode = getAntinode(currentLocation, nextLocation);
+
+                    while(antinode.x >= 0 && antinode.x < x.get() && antinode.y >= 0 && antinode.y < y.get()) {
+                        antinodes.add(antinode);
+
+                        currentLocation = new Point(nextLocation);
+                        nextLocation = new Point(antinode);
+                        antinode = getAntinode(currentLocation, nextLocation);
+                    }
+                }
+
+                antinodes.add(locations.get(i));
             }
         });
 
