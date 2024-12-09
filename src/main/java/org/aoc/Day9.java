@@ -77,7 +77,7 @@ public class Day9 {
 
             int size = ((int) blocks.stream().filter(el -> el != null && el.equals(index)).count());
 
-            for (int i = 0; i < j - size; i++) {
+            for (int i = 0; i < j - size + 1; i++) {
                 if (blocks.subList(i, i + size).stream().noneMatch(Objects::nonNull)) {
                     for (int k = 0; k < size; k++) {
                         blocks.set(i + k, blocks.get(j - k));

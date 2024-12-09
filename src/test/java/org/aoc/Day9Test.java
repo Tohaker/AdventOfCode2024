@@ -35,4 +35,16 @@ public class Day9Test {
     void testPart2Example() {
         assertEquals(2858, Day9.part2(exampleInput));
     }
+
+    @Test
+    @DisplayName("Should defragment whole blocks with small edgecase")
+    void testPart2ExtraExample() {
+        assertEquals(100, Day9.part2("1111223"));
+    }
+
+    @Test
+    @DisplayName("Part 2 should return 6389911791746")
+    void testPart2() {
+        assertEquals(Long.parseLong("6389911791746"), Day9.part2(realInput));
+    }
 }
