@@ -33,6 +33,6 @@ public class Day9Test {
     @Test
     @DisplayName("Should defragment whole blocks and checksum the filesystem")
     void testPart2Example() {
-        assertEquals(2858, Day9.part1(exampleInput));
+        assertEquals(2858, Day9.part2(exampleInput));
     }
 }

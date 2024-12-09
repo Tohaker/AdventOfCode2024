@@ -12,7 +12,7 @@ public class Day9 {
         String input = FileUtils.openInput("Day9.txt");
 
         System.out.println("Day 9 - Part 1: " + part1(input));
-//        System.out.println("Day 9 - Part 2: " + part2(input));
+        System.out.println("Day 9 - Part 2: " + part2(input));
     }
 
     public static long part1(String input) {
@@ -53,6 +53,37 @@ public class Day9 {
     }
 
     public static long part2(String input) {
+        List<Integer> fileBlocks = new ArrayList<>();
+        List<Integer> freeBlocks = new ArrayList<>();
+
+        for (int i = 0; i < input.length(); i += 2) {
+            int files = input.charAt(i) - '0'; // Effective conversion of char to int for ASCII characters
+            int freeSpace = 0;
+
+            if (i + 1 < input.length()) {
+                freeSpace = input.charAt(i + 1) - '0';
+            }
+
+            fileBlocks.add(files);
+            freeBlocks.add(freeSpace);
+        }
+
+        List<Integer> blocks = new ArrayList<>();
+
+        // Start at the end of the file blocks
+        for (int i = fileBlocks.size() - 1; i >= 0; i--) {
+            // Get last file block size and index
+            int size = fileBlocks.get(i);
+            int index = i;
+
+            // Get first free space that can fit the file
+            for (int j = 0; j < freeBlocks.size(); j++) {
+                if (freeBlocks.get(i) >= size) {
+                    blocks
+                }
+            }
+        }
+
         return 0;
     }
 }
