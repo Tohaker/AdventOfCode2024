@@ -38,4 +38,16 @@ public class Day10Test {
     void testPart1() {
         assertEquals(667, Day10.part1(realInput));
     }
+
+    @Test
+    @DisplayName("Should sum all trailhead scores")
+    void testPart2Example() {
+        assertEquals(81, Day10.part2(exampleInput));
+    }
+
+    @Test
+    @DisplayName("Part 2 should return 1344")
+    void testPart2() {
+        assertEquals(1344, Day10.part2(realInput));
+    }
 }

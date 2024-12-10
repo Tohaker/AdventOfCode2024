@@ -12,7 +12,7 @@ public class Day10 {
         String input = FileUtils.openInput("Day10.txt");
 
         System.out.println("Day 10 - Part 1: " + part1(input));
-//        System.out.println("Day 10 - Part 2: " + part2(input));
+        System.out.println("Day 10 - Part 2: " + part2(input));
     }
 
     static List<Point> findAdjacentPoints(Point point) {
@@ -26,8 +26,8 @@ public class Day10 {
         return adjacentPoints;
     }
 
-    static int recurseThroughPositions2(Map<Point, Integer> positions, Point currentPosition, int level, int count) {
-        if (level == 9) {
+    static int findTrailheadRatings(Map<Point, Integer> positions, Point currentPosition, int level, int count) {
+        if (level == 10) {
             return count + 1;
         }
 
@@ -38,13 +38,13 @@ public class Day10 {
                 .toList();
 
         for (Point point: adjacentPoints) {
-            count = recurseThroughPositions2(positions, point, level + 1, count);
+            count = findTrailheadRatings(positions, point, level + 1, count);
         }
 
         return count;
     }
 
-    static Set<Point> recurseThroughPositions(Map<Point, Integer> positions, Point currentPosition, int level, Set<Point> peaks) {
+    static Set<Point> findTrailheadPeaks(Map<Point, Integer> positions, Point currentPosition, int level, Set<Point> peaks) {
         if (level == 10) {
             peaks.add(currentPosition);
         }
@@ -56,13 +56,13 @@ public class Day10 {
                 .toList();
 
         for (Point point: adjacentPoints) {
-            recurseThroughPositions(positions, point, level + 1, peaks);
+            findTrailheadPeaks(positions, point, level + 1, peaks);
         }
 
         return peaks;
     }
 
-    public static int part1(String input) {
+    static Map<Point, Integer> parseInput(String input) {
         Map<Point, Integer> positions = new HashMap<>();
         List<String> lines = input.lines().toList();
 
@@ -73,20 +73,39 @@ public class Day10 {
             }
         }
 
-        List<Point> zeroPositions = positions
+        return positions;
+    }
+
+    static List<Point> getStartingPoints(Map<Point, Integer> positions) {
+        return positions
                 .entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().equals(0))
                 .map(Map.Entry::getKey)
                 .toList();
+    }
 
-        int total = 0;
+    public static int part1(String input) {
+        Map<Point, Integer> positions = parseInput(input);
+        List<Point> zeroPositions = getStartingPoints(positions);
 
-        for (Point start: zeroPositions) {
-            Set<Point> peaks = recurseThroughPositions(positions, start, 1, new HashSet<>());
-            total += peaks.size();
-        }
+        return zeroPositions
+                .stream()
+                .reduce(0,
+                        (accumulator, start) -> accumulator +
+                                findTrailheadPeaks(positions, start, 1, new HashSet<>()).size(),
+                        Integer::sum);
+    }
 
-        return total;
+    public static int part2(String input) {
+        Map<Point, Integer> positions = parseInput(input);
+        List<Point> zeroPositions = getStartingPoints(positions);
+
+        return zeroPositions
+                .stream()
+                .reduce(0,
+                        (accumulator, start) -> accumulator +
+                                findTrailheadRatings(positions, start, 1, 0),
+                        Integer::sum);
     }
 }
