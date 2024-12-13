@@ -37,24 +37,24 @@ public class Day13Test {
     @Test
     @DisplayName("Should find the fewest tokens to win the most prizes")
     void testPart1Example() {
-        assertEquals(480, Day13.part1(exampleInput));
+        assertEquals(480, Day13.solvePart(exampleInput, 0));
     }
 
     @Test
     @DisplayName("Part 1 return 35574")
     void testPart1() {
-        assertEquals(35574, Day13.part1(realInput));
+        assertEquals(35574, Day13.solvePart(realInput, 0));
     }
 
     @Test
     @DisplayName("Should find the fewest tokens to win the most big offset prizes")
     void testPart2Example() {
-        assertEquals(875318608908L, Day13.part2(exampleInput));
+        assertEquals(875318608908L, Day13.solvePart(exampleInput, 10000000000000L));
     }
 
     @Test
     @DisplayName("Part 2 return 80882098756071")
     void testPart2() {
-        assertEquals(80882098756071L, Day13.part2(realInput));
+        assertEquals(80882098756071L, Day13.solvePart(realInput, 10000000000000L));
     }
 }

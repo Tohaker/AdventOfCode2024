@@ -24,7 +24,6 @@ class Equation {
     int B;
     long prize;
 
-    // TODO: Make this accept string block
     Equation(int A, int B, int prize, long offset) {
         this.A = A;
         this.B = B;
@@ -42,7 +41,7 @@ class Equation {
         double b = (double) (e.prize * this.A - this.prize * e.A) / determinant;
 
         if ((long) a == a && (long) b == b) {
-            return new Pair((long)a, (long)b);
+            return new Pair((long) a, (long) b);
         }
 
         return new Pair(0, 0); // No integer solution
@@ -53,10 +52,9 @@ public class Day13 {
     public static void main(String[] args) throws IOException {
         String input = FileUtils.openInput("Day13.txt");
 
-        System.out.println("Day 13 - Part 1: " + part1(input));
-        System.out.println("Day 13 - Part 2: " + part2(input));
+        System.out.println("Day 13 - Part 1: " + solvePart(input, 0));
+        System.out.println("Day 13 - Part 2: " + solvePart(input, 10000000000000L));
     }
-
 
     static List<ArrayList<Equation>> parseInput(String input, long offset) {
         Pattern p = Pattern.compile("(\\d+), \\D+(\\d+)");
@@ -90,8 +88,8 @@ public class Day13 {
         }).toList();
     }
 
-    public static long part1(String input) {
-        var equations = parseInput(input, 0);
+    public static long solvePart(String input, long offset) {
+        var equations = parseInput(input, offset);
 
         long total = 0;
 
@@ -99,20 +97,6 @@ public class Day13 {
             var solved = pair.getFirst().solveSimultaneousEquation(pair.getLast());
 
             total += solved.a * 3 + solved.b;
-        }
-
-        return total;
-    }
-
-    public static long part2(String input) {
-        var equations = parseInput(input, 10000000000000L);
-
-        long total = 0;
-
-        for (List<Equation> pair: equations) {
-            var solved = pair.getFirst().solveSimultaneousEquation(pair.getLast());
-
-            total += solved.a * 3L + solved.b;
         }
 
         return total;
