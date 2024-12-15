@@ -7,103 +7,90 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 class WarehouseItem {
-    Point position;
+    List<Point> position;
     List<Point> walls;
     List<WarehouseItem> boxes;
-    String representation;
 
-    WarehouseItem(int x, int y, String representation, List<Point> walls, List<WarehouseItem> boxes) {
-        this.position = new Point(x, y);
+    WarehouseItem(List<Point> position, List<Point> walls, List<WarehouseItem> boxes) {
+        this.position = position;
         this.walls = walls;
         this.boxes = boxes;
-        this.representation = representation;
     }
 
     public int getGPSCoordinate() {
-        if (representation.equals("]")) return 0;
-
-        return 100 * position.y + position.x;
+        return 100 * position.getFirst().y + position.getFirst().x;
     }
 
-    public boolean move(String direction, boolean checkOther) {
-        Point nextPosition = new Point(position);
+    public List<Point> move(String direction) {
+        List<Point> nextPosition = position.stream().map(Point::new).toList();
 
         switch (direction) {
             case "<": {
-                nextPosition.translate(-1, 0);
+                nextPosition.getFirst().translate(-1, 0);
+
+                if (nextPosition.size() > 1) {
+                    nextPosition.getLast().translate(-1, 0);
+                }
                 break;
             }
             case "^": {
-                nextPosition.translate(0, -1);
+                nextPosition.getFirst().translate(0, -1);
+
+                if (nextPosition.size() > 1) {
+                    nextPosition.getLast().translate(0, -1);
+                }
                 break;
             }
             case ">": {
-                nextPosition.translate(1, 0);
+                nextPosition.getFirst().translate(1, 0);
+
+                if (nextPosition.size() > 1) {
+                    nextPosition.getLast().translate(1, 0);
+                }
                 break;
             }
             case "v": {
-                nextPosition.translate(0, 1);
+                nextPosition.getFirst().translate(0, 1);
+
+                if (nextPosition.size() > 1) {
+                    nextPosition.getLast().translate(0, 1);
+                }
                 break;
             }
         }
 
         var boxesInNextPosition = boxes
                 .stream()
-                .filter(b -> b.position.equals(nextPosition))
+                .filter(b -> b.position.stream().anyMatch(nextPosition::contains))
+                .filter(b -> !b.equals(this))
                 .toList();
 
-        var verticalMovement = direction.equals("^") || direction.equals("v");
+        if (walls.stream().anyMatch(nextPosition::contains)) {
+            return null;
+        }
 
         if (!boxesInNextPosition.isEmpty()) {
-            var nextBox = boxesInNextPosition.getFirst();
-            if (checkOther && verticalMovement) {
-                int newX = nextPosition.x;
+            // All boxes must resolve to whether they can be moved (not a single one hits a wall)
+            // before committing to moving.
 
-                if (nextBox.representation.equals("[")) {
-                    newX++;
-                } else if (nextBox.representation.equals("]")) {
-                    newX--;
+            var movements = boxesInNextPosition.stream().map(b -> b.move(direction)).toList();
+            var moved = movements.stream().allMatch(Objects::nonNull);
+            if (moved) {
+                for (int i = 0; i < movements.size(); i++) {
+                    boxesInNextPosition.get(i).position.getFirst().setLocation(movements.get(i).getFirst());
+
+                    if (movements.get(i).size() > 1) {
+                        boxesInNextPosition.get(i).position.getLast().setLocation(movements.get(i).getLast());
+                    }
                 }
-
-                int finalNewX = newX;
-                var boxesInOtherPosition = boxes
-                        .stream()
-                        .filter(b -> b.position.equals(new Point(finalNewX, nextPosition.y)))
-                        .toList();
-
-                if (!boxesInOtherPosition.isEmpty()) {
-                    var moved = nextBox.move(direction, true) && boxesInOtherPosition.getFirst().move(direction, true);
-                    if (!moved) return false;
-                }
-            } else {
-                var moved = boxesInNextPosition.getFirst().move(direction, false);
-                if (!moved) return false;
-            }
+            } else return null;
         }
 
-        if (checkOther && verticalMovement && !representation.equals("O") && !representation.equals("@")) {
-            int newX = nextPosition.x;
-
-            if (representation.equals("[")) {
-                newX++;
-            } else if (representation.equals("]")) {
-                newX--;
-            }
-
-            if (walls.contains(new Point(newX, nextPosition.y)) || walls.contains(nextPosition)) {
-                return false;
-            }
-        }
-
-        if (walls.contains(nextPosition)) {
-            return false;
-        }
-
-        position.setLocation(nextPosition);
-        return true;
+        return nextPosition;
     }
 }
 
@@ -116,7 +103,7 @@ public class Day15 {
     }
 
     public static int part1(String input) {
-        var splitted = input.split("\\n\\n");
+        var splitted = input.split("\\r\\n\\r\\n");
         var grid = splitted[0];
         var instructions = Arrays.stream(splitted[1].lines().collect(Collectors.joining()).split("")).toList();
 
@@ -129,12 +116,10 @@ public class Day15 {
         for (int y = 0; y < lines.size(); y++) {
             var line = Arrays.stream(lines.get(y).split("")).toList();
             for (int x = 0; x < line.size(); x++) {
-                if (line.get(x).equals("#")) {
-                    walls.add(new Point(x, y));
-                } else if (line.get(x).equals("O")) {
-                    boxes.add(new WarehouseItem(x, y, line.get(x), walls, boxes));
-                } else if (line.get(x).equals("@")) {
-                    robot = new WarehouseItem(x, y, line.get(x), walls, boxes);
+                switch (line.get(x)) {
+                    case "#" -> walls.add(new Point(x, y));
+                    case "O" -> boxes.add(new WarehouseItem(new ArrayList<>(List.of(new Point(x, y))), walls, boxes));
+                    case "@" -> robot = new WarehouseItem(new ArrayList<>(List.of(new Point(x, y))), walls, boxes);
                 }
             }
         }
@@ -146,7 +131,9 @@ public class Day15 {
         }
 
         for (String instruction : instructions) {
-            robot.move(instruction, false);
+            var nextPos = robot.move(instruction);
+
+            if (nextPos != null) robot.position.getFirst().setLocation(nextPos.getFirst());
         }
 
         for (WarehouseItem box : boxes) {
@@ -157,6 +144,7 @@ public class Day15 {
     }
 
     public static int part2(String input) {
+//        var splitted = input.split("\\n\\n\\r\\n");
         var splitted = input.split("\\n\\n");
         var grid = splitted[0];
         var instructions = Arrays.stream(splitted[1].lines().collect(Collectors.joining()).split("")).toList();
@@ -176,12 +164,14 @@ public class Day15 {
         for (int y = 0; y < lines.size(); y++) {
             var line = Arrays.stream(lines.get(y).split("")).toList();
             for (int x = 0; x < line.size(); x++) {
-                if (line.get(x).equals("#")) {
-                    walls.add(new Point(x, y));
-                } else if (line.get(x).equals("[") || line.get(x).equals("]")) {
-                    boxes.add(new WarehouseItem(x, y, line.get(x), walls, boxes));
-                } else if (line.get(x).equals("@")) {
-                    robot = new WarehouseItem(x, y, line.get(x), walls, boxes);
+                switch (line.get(x)) {
+                    case "#" -> walls.add(new Point(x, y));
+                    case "[" -> {
+                        var position = new ArrayList<>(List.of(new Point(x, y), new Point(x + 1, y)));
+
+                        boxes.add(new WarehouseItem(position, walls, boxes));
+                    }
+                    case "@" -> robot = new WarehouseItem(new ArrayList<>(List.of(new Point(x, y))), walls, boxes);
                 }
             }
         }
@@ -193,44 +183,13 @@ public class Day15 {
         }
 
         for (String instruction : instructions) {
-            robot.move(instruction, true);
+           var nextPos = robot.move(instruction);
+
+           if (nextPos != null) robot.position.getFirst().setLocation(nextPos.getFirst());
         }
 
         for (WarehouseItem box : boxes) {
             total += box.getGPSCoordinate();
-        }
-
-        StringBuilder newGrid = new StringBuilder();
-        for (int y = 0; y < lines.size(); y++) {
-            var line = Arrays.stream(lines.get(y).split("")).toList();
-            StringBuilder newLine = new StringBuilder();
-            for (int x = 0; x < line.size(); x++) {
-                Point p = new Point(x, y);
-
-                if (walls.contains(p)) {
-                    newLine.append("#");
-                    continue;
-                }
-
-                var boxList = boxes
-                        .stream()
-                        .filter(b -> b.position.equals(p))
-                        .toList();
-
-                if (!boxList.isEmpty()) {
-                    newLine.append(boxList.getFirst().representation);
-                    continue;
-                }
-
-                if (p.equals(robot.position)) {
-                    newLine.append("@");
-                    continue;
-                }
-
-                newLine.append(".");
-            }
-
-            newGrid.append(newLine).append("\n");
         }
 
         return total;

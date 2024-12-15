@@ -119,4 +119,60 @@ public class Day15Test {
 
         assertEquals(9021, Day15.part2(exampleInput));
     }
+
+    @Test
+    // https://github.com/Fadi88/AoC/blob/master/2024/day15/test_corner.txt
+    @DisplayName("Should calculate the sum of all GPS coords of big boxes in example 3")
+    void testPart2Example3() {
+        String exampleInput = """
+                #######
+                #.....#
+                #.....#
+                #.@O..#
+                #..#O.#
+                #...O.#
+                #..O..#
+                #.....#
+                #######
+                
+                >><vvv>v>^^^
+                """;
+
+        assertEquals(1430, Day15.part2(exampleInput));
+    }
+
+    @Test
+    void testPart2Example4() {
+        String exampleInput = """
+                #######
+                #...#.#
+                #.....#
+                #.....#
+                #.....#
+                #.....#
+                #.OOO@#
+                #.OOO.#
+                #..O..#
+                #.....#
+                #.....#
+                #######
+                
+                v<vv<<^^^^^
+                """;
+
+        assertEquals(2339, Day15.part2(exampleInput));
+    }
+
+//    ##############
+//    ##......##..##
+//    ##..[][][]..##
+//    ##...[][]...##
+//    ##....[]....##
+//    ##.....@....##
+//    ##..........##
+//    ##.[].......##
+//    ##..........##
+//    ##..........##
+//    ##..........##
+//    ##############
 }
